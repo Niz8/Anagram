@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anagram Solver</title>
+
+<style>
+  :root {
+    --bg: #f4f2ed;
+    --bg2: #eceae3;
+    --surface: #ffffff;
+    --border: #d8d4c8;
+    --border-focus: #7a9e7e;
+    --accent: #5a8a5e;
+    --accent-light: #e8f0e8;
+    --text: #1a1a18;
+    --muted: #7a7870;
+    --muted2: #b0aca0;
+    --red: #c0504a;
+    --toggle-bg: #c8c4ba;
+    --shadow: 0 2px 14px rgba(0,0,0,0.07);
+  }
+
+  [data-theme="dark"] {
+    --bg: #161819;
+    --bg2: #1e2124;
+    --surface: #23272c;
+    --border: #363c44;
+    --border-focus: #6aaa6e;
+    --accent: #7aba7e;
+    --accent-light: #1c2e1e;
+    --text: #e8e6e0;
+    --muted: #888078;
+    --muted2: #5a5850;
+    --red: #e06060;
+    --toggle-bg: #3a3e44;
+    --shadow: 0 2px 20px rgba(0,0,0,0.35);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html {
+    background: var(--bg);
+    transition: background 0.3s;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, monospace;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px 100px;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  .topbar {
+    width: 100%;
+    max-width: 620px;
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 28px;
+  }
+
+  .theme-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px 6px 10px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    font-family: 'DM Mono', ui-monospace, Menlo, Consolas, monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    transition: border-color 0.2s, color 0.2s, background 0.3s;
+  }
+  .theme-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  header {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+
+  .logo-word {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(2.8rem, 10vw, 4.2rem);
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    color: #1a1a18;
+    margin-bottom: 4px;
+  }
+  [data-theme="dark"] .logo-word { color: #e8e6e0; }
+  .logo-word .hi { color: #5a8a5e; }
+  [data-theme="dark"] .logo-word .hi { color: #7aba7e; }
+
+  header p {
+    color: var(--muted);
+    font-size: 0.72rem;
+    margin-top: 4px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 30px;
+    width: 100%;
+    max-width: 620px;
+    box-shadow: var(--shadow);
+    transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+  }
+
+  .field-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .hint-badge {
+    background: var(--accent-light);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 7px;
+    font-size: 0.6rem;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+    text-transform: none;
+    transition: background 0.3s;
+  }
+
+  .main-input {
+    width: 100%;
+    background: var(--bg2);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    padding: 14px 20px;
+    text-transform: uppercase;
+    outline: none;
+    transition: border-color 0.2s, background 0.3s;
+    caret-color: var(--accent);
+    margin-bottom: 10px;
+  }
+  .main-input:focus { border-color: var(--border-focus); background: var(--surface); }
+  .main-input::placeholder { color: var(--muted2); font-size: 1.3rem; letter-spacing: 0.1em; }
+
+  .wildcard-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  .wildcard-note {
+    font-size: 0.67rem;
+    color: var(--muted2);
+    line-height: 1.5;
+    flex: 1;
+  }
+  .wildcard-note strong { color: var(--accent); font-weight: 500; }
+
+  .wc-dots {
+    display: flex;
+    gap: 5px;
+    flex-shrink: 0;
+  }
+  .wc-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .wc-dot.used { background: var(--accent); border-color: var(--accent); }
+
+  /* Advanced toggle */
+  .advanced-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+    width: fit-content;
+  }
+  .advanced-toggle input { display: none; }
+
+  .toggle-track {
+    width: 38px; height: 22px;
+    background: var(--toggle-bg);
+    border-radius: 11px;
+    position: relative;
+    transition: background 0.25s;
+    flex-shrink: 0;
+  }
+  .toggle-track::after {
+    content: '';
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 16px; height: 16px;
+    background: var(--surface);
+    border-radius: 50%;
+    transition: transform 0.25s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+  }
+  .advanced-toggle input:checked + .toggle-track { background: var(--accent); }
+  .advanced-toggle input:checked + .toggle-track::after { transform: translateX(16px); }
+
+  .toggle-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .advanced-panel {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    margin-top: 0;
+    transition: max-height 0.38s ease, opacity 0.3s ease, margin-top 0.3s ease;
+  }
+  .advanced-panel.open { max-height: 280px; opacity: 1; margin-top: 20px; }
+
+  .adv-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .adv-field { display: flex; flex-direction: column; }
+  .adv-field.full { grid-column: span 2; }
+
+  .adv-input {
+    width: 100%;
+    background: var(--bg2);
+    border: 1.5px solid var(--border);
+    border-radius: 9px;
+    color: var(--text);
+    font-family: 'DM Mono', ui-monospace, Menlo, Consolas, monospace;
+    font-size: 0.9rem;
+    letter-spacing: 0.12em;
+    padding: 10px 14px;
+    text-transform: uppercase;
+    outline: none;
+    transition: border-color 0.2s, background 0.3s;
+    caret-color: var(--accent);
+  }
+  .adv-input:focus { border-color: var(--border-focus); background: var(--surface); }
+  .adv-input::placeholder { color: var(--muted2); text-transform: none; font-size: 0.75rem; letter-spacing: 0.04em; }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+
+  .solve-btn {
+    width: 100%;
+    background: #5a8a5e;
+    color: #fff;
+    border: none;
+    border-radius: 11px;
+    font-family: 'DM Mono', ui-monospace, Menlo, Consolas, monospace;
+    font-size: 0.82rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 15px;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s, background 0.3s;
+  }
+  [data-theme="dark"] .solve-btn { background: #7aba7e; }
+  .solve-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+  .solve-btn:active { transform: translateY(0); }
+
+  /* Results */
+  #results-wrap { width: 100%; max-width: 620px; margin-top: 22px; }
+
+  .results-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    padding: 0 2px;
+  }
+  .results-title {
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .results-count { font-size: 0.7rem; color: var(--accent); }
+
+  .length-group { width: 100%; margin-bottom: 16px; }
+  .length-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted2);
+    margin-bottom: 7px;
+  }
+  .chips-row { display: flex; flex-wrap: wrap; gap: 7px; }
+
+  .word-chip {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 5px 13px;
+    font-family: 'DM Mono', ui-monospace, Menlo, Consolas, monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text);
+    cursor: default;
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
+    animation: chipIn 0.22s ease backwards;
+  }
+  .word-chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
+  @keyframes chipIn {
+    from { opacity: 0; transform: translateY(4px) scale(0.95); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  .no-results {
+    color: var(--muted);
+    font-size: 0.8rem;
+    padding: 28px 0;
+    text-align: center;
+    border-top: 1px solid var(--border);
+  }
+
+  .loading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--muted);
+    font-size: 0.78rem;
+    padding: 24px 0;
+  }
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .error-msg { color: var(--red); font-size: 0.78rem; padding: 16px 0; }
+
+  .disclaimer {
+    width: 100%;
+    max-width: 620px;
+    margin-top: 48px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    font-size: 0.62rem;
+    color: var(--muted2);
+    letter-spacing: 0.06em;
+    line-height: 1.7;
+    text-align: center;
+  }
+
+  .disclaimer strong {
+    color: var(--muted);
+    font-weight: 500;
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <button class="theme-btn" id="theme-btn" onclick="toggleTheme()">
+    <span id="theme-icon">☽</span>
+    <span id="theme-label">Dark mode</span>
+  </button>
+</div>
+
+<header>
+  <div class="logo-word">Ana<span class="hi">gr</span>am</div>
+  <p>Solver &nbsp;·&nbsp; Unscramble any word</p>
+</header>
+
+<div class="card">
+  <div class="field-label">
+    Your letters
+    <span class="hint-badge">space or ? = wildcard</span>
+  </div>
+  <input class="main-input" id="letters" type="text" placeholder="e.g.  RATES  ??" maxlength="24" autocomplete="off" spellcheck="false">
+
+  <div class="wildcard-row">
+    <p class="wildcard-note">
+      Up to <strong>3</strong> wildcards — press <strong>space</strong> or type <strong>?</strong>
+    </p>
+    <div class="wc-dots">
+      <div class="wc-dot" id="wc0"></div>
+      <div class="wc-dot" id="wc1"></div>
+      <div class="wc-dot" id="wc2"></div>
+    </div>
+  </div>
+
+  <label class="advanced-toggle">
+    <input type="checkbox" id="adv-toggle">
+    <span class="toggle-track"></span>
+    <span class="toggle-label">Advanced options</span>
+  </label>
+
+  <div class="advanced-panel" id="adv-panel">
+    <div class="adv-grid">
+      <div class="adv-field">
+        <div class="field-label">Starts with</div>
+        <input class="adv-input" type="text" id="starts" placeholder="e.g. pre" maxlength="10" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="adv-field">
+        <div class="field-label">Ends with</div>
+        <input class="adv-input" type="text" id="ends" placeholder="e.g. ing" maxlength="10" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="adv-field full">
+        <div class="field-label">Exclude letters</div>
+        <input class="adv-input" type="text" id="exclude" placeholder="letters that must not appear in results" maxlength="26" autocomplete="off" spellcheck="false">
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+  <button class="solve-btn" id="solve-btn">Find Words</button>
+</div>
+
+<div id="results-wrap"></div>
+
+<footer class="disclaimer">
+  <strong>⚡ Vibecoded</strong> &nbsp;—&nbsp; This tool was built with vibes and AI assistance.
+  Word results may be incomplete or incorrect. Use at your own risk.
+  Not responsible for Scrabble disputes, crossword catastrophes, or general wordplay mayhem.
+</footer>
+
+<script>
+// ── Theme ─────────────────────────────────────────────────────────────────────
+function toggleTheme() {
+  const html = document.documentElement;
+  const going_dark = html.getAttribute('data-theme') === 'light';
+  html.setAttribute('data-theme', going_dark ? 'dark' : 'light');
+  document.getElementById('theme-icon').textContent = going_dark ? '☀' : '☽';
+  document.getElementById('theme-label').textContent = going_dark ? 'Light mode' : 'Dark mode';
+}
+
+// Auto-detect system preference
+if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+  document.documentElement.setAttribute('data-theme', 'dark');
+  document.getElementById('theme-icon').textContent = '☀';
+  document.getElementById('theme-label').textContent = 'Light mode';
+}
+
+// ── Word list ─────────────────────────────────────────────────────────────────
+let WORDS = null;
+
+async function loadWords() {
+  const W = `ab able above ace aces ache ached aches acid acids act acts add adds age aged ages ago ahead aid aide aids aim aims air aired airs ale ales alive all aloe aloes aloft alone aloud also alter alters am amble among amp ample amps an and angle ankle ant ante anted ants any apart ape aped apes apex apt arc arch arcs are area areas arm armed arms arrive arson art arts ash ask asks ate atone avid awe awed awes axe axes axle bad bade bag bags bail bald bale ban band bands bane banes bang bar bare bared bares barge bark barks barn barns bars base based bash basis bat bate bated bates bats battle bay bays bead beak beam beams bean beans bear bears beat beats beck bed beds bee beef been beep beer bees bench bend beset best bet bets bid bide bides bids bike biked bikes bill bills bin bird bit bite bites bits blade blades blame blare blared blares blast blasts blaze blend blight blister block blood blot blots blouse blow blows blue blued blues bluff blunt blur blurs blush board boat boats bob boil boils bold bolt bolts bond bone boned bones boon booth booths bore bored bores born bound bout bow bowed bower boy boys braid braids brain brains brake brakes bran brans brave braved braves brawl brawls bray bread brew brews bribe brick bride bridge brief bright brim brims brine brines bring brink brisk brood broth brow brown brows bruise brunch brush buck bud budge buds buff bug bugs bull bun bunch buns bunt burn burns bust but butter buy buyer buyers buys bye byes cab cabin cable cabs cage caged cages cake cakes calm calms came camel cane caned canes canoe cant cap cape capes caps car card cards care cared cares cars cart carts case cased cases cast casts cat catch cats cave caved caves cedar cent cents chafe chain chains chair chairs chalk chalks champ chance chanced chances chant charge charm charms chart charts chase chased check child chime chin chip choice church claim clam clamor clamp clang clap clay clear cleft clench click cliff climb cling clip cloak clock clone cloth cloud clouds clown club clue clutter coat cob cobs cod code coded codes cog cogs coil coils coin coined coins coke cold come comes comet cone conk cool cools cop cope coped copes cops coral cord core cored cores corn corns cost cot cots cough could course court cove cowed cram crams crane craned cranes crash creak creaks creed creep crest crests crew crime crimp crisp croak crop crops crow crowd crown crows cruise crunch crush crust cub cube cubed cubes cubs cuff cup cups cure cured cures curl curls cut cute cuts cutter cycle dab dabs dagger daisy dale dales dam dame dames damp damps dams dare dared dares dark darn darns dart darts date dated dates dawn daze dead deal deals dean deans dear dears debt debts decal decay deck decoy defer deft delta den dens dense depth derby desk desks devil die dies dim dime dimes dims din dine dingy dip dips dire disco disk disks ditch dive dived dives dock dodge dog dogs doll dome domes done donkey dote doted dotes douse dove doves down drape draw drawn draws drew drill drills drink drinks drip drips drive drives drone drones drool drop drops drove drown drums duck duels dug dumb dump dumps dunce dune dunes dupe duped dupes dust dusty dwarf eager eagle ear early earn earns ears earth ease eased east eater eaters edge edged edges eel elf elm elms emote empty emu emus end endow ends enough enter envoy era eras erode even evens event ever evil evils ewe ewes exact exam exert extra fable face faced faces fact facts fade faded fades fair fairs fairy fake faked fakes falter fame famed fancy fang far fare fared fares farm farms fast fatal fats faze fear fears feast feat feel feels feet fell fence fend fern ferns fetch fetchetch fiber fiend fight fill fills film films fin fine fined fines fir fire fired fires firs fist fit fits flair flame flames flank flap flare flared flares flash flat flats flaw flaws flea fleas fled fleet flesh flew flick fling flint flip flock flood floss flour flow flower fluff flush flute flutter fly foal foam focal fogs fold folds folio fond fool fools foray force ford fore forge form forms fort forts found fourth frail frame framed frames frank fray freak free freed frees french fresh fret frets fridge friend fright frill frog frogs frond front frost frown frugal fruit fruits fudge fuel fuels full fume fumed fumes fun fungi fur gable gain gains gale gales gamble game gamed games gang gap gaps gash gate gated gates gave gaze gazed gazes gear gears geek ghost gill gin girl girth gist give given glad glade glades glamour gland glare glared glares gleam glean gleans glide glides glint gloat globe glory gloss glove glow gnat gnats goat goats gold gong good gore gores gorge gosh gown grace grade grain gram grammar grams grant grape grapes grasp grasps grate grated grates gray grays graze grazed greed green greens greet grew grid grids grill grime grimed grimes grind grinds grip gripe groan groans grope groped gropes gross ground grouse grout grove groves grow growl growls grown grows growth grub gruff guard guards guise gulp gulps gush gust gut gutter habit had hail hair hairs hale half halt halts ham hammer hamper hand hands hang hangs hard hare hared hares harm harms hate hated hater haters hates haul hauls have haven hay haze head heads heal heals heap heaps hear heat heats hedge heel heels heist helm helms herd herds hill hint hip hips hire hired hires hit hits hive hived hives hoard hold holds hole holed holes holly home homed homes hone honey honor hood hoods hop hope hoped hopes hops horn horns horse host hot hound hour hours house houses hub hubs hue hues hum humid hump humps hums hunch hunt hurl hurls hush hustle hut ice iced ices idle idled idles image imp imps infer ingot ink inks inn inns input inter inure ion ions irk irks iron irons isle isles issue ivory jab jabs jam jams jar jars jelly jewel job jolt jolts josh joust judge juice jumpy just jut keen keep kill kin kneel knock knoll know lab label labs lace laced laces lack lacks lake lakes lamb lambs lame lamed lames lamp lamps land lands lane lanes lard large lark larks lash last latch late later latex lathe laugh laughs layer layers laze lazed lazes lead leads leafy leak lean leans leap leaps leapt learn learns led ledge left legal lemon lend lends let lets lever libel lice lie lied lies light lime line linen liner lingo link links lip list live lived lives loan lob lobe lobes lobs lock locks lodge loft logic long lord lore lose loss lost lot lots loud louse lout love loved loves low lower luck lull lulls lump lumps lunar lunch lunge lunged lunges lurch lure lured lures lurk lurks lusty made magic mail mails maim main man mane manes many map maple mapper maps mar march mare mares marge mark marks mast mat mate mated mates maze mazed mazes mead meal meals mean means meat meats medal medic meek meet melee mend mends mesh metal mice might mild mile miles mill mime mince mind mine minor mint mirth mist mister moan mob mock mode model moist mold moldy mole moles molt molts month months moose mop mope moped mopes mops moral most motto mound mouse mouth mouths mow muck mud mug mugs mulch mule mules mull mulls munch mural mush must mutter nail nails naive name named names nap napper naps nave navel naves near nears neat neck necks need needs nerve newly newt newts night nine nip nit nits node nodes noise nomad north nose nosed note noted notes nudge numb nut nymph oak oaks oar oars offer often oil oils old omen omens one onion oral orb orbs ore ores otter outer outfit own page pages pail pain pair pairs pal pale paled pales pals pan pane panes pang pangs papal par pare pared pares park parks parry part parts pasta paste pat patch path paths pause pave paved paves pay payee pays peak peal peals pear pearl pears peat peck pedal peek peel pen pens perch petal phase phone phony photo piano pill pilot pin pine pined pines pins pipe pit pits place plain plait plan plane planed planes plant plate plated plates play player players plays plead pleads pleat pledge plight plow plows plum plumb plumbs plume plunk plunks plus plush poise poker pole poles polka poll pond pool pools porch pored pores port pose posh post pound pout pouty power pray prayer prayers preen press prey preys prime prince print probe probed probes prone prop props proud prove proved proxy psalm pub puck puff pump pun punch punt put puts quaff quail qualm quart quasi queen query quest quick quill quirk quota quote race raced racer races rack racks radar raft rafts rail rails rain ram rams rang range ranged ranges rank ranks rant rap rash rate rated rates rave raved raven raves raw ray rayon rays raze reach read reads real realm realms reap reaps rear rebel red reds reef reek reel reels reign relic rend rends renew rent rents repay repel repent reply rerun rest reuse rhyme rib ribs rid ride rider rides ridge riff rig right rigid rigs rile riles rime rimed rimes ring rings rink rinks rip ripe ripen rips rise risk rival rivet road roads roam roar roars roast rob robe robes robot rocky rods role roles roll roman rondo roost rope roped ropes rose rot rote rots rough round rouse route routed routes rove roved roves row rows royal rub rubs rude rue ruin ruins rule ruled rules rump run rung rungs runs runt rural rush rust rut ruts sad safe safer sage sail sails saint sake sale sales salt same sand sandy sane sang sap saps sat sauce save saved saves scald scalp scam scant scar scarf scent school schools scope scorch score scout screen screw scrub sea seal seals seam sear search sears seat seats sedan seek seen seep seize self send sense sent serve set sets seven shaft shame share shared shark sharks shear shed sheen sheep sheet sheets shelf shell shift shine ship ships shirt shock shoe shoes shop shops short shot should shout shove show shower shows shred shriek shrine shrink shroud shrub sight sign sill sin since sing sink sinks sir sister site sites size sized sizes sketch skiff skin skins skip skips skirt skull slab slack slam slant slap slat slate slated slates slave slaved slaves slay slayer slayers slays sleep sleet slew slick slid slight slim slime slimed slimes slip slips sliver slob slope sloped slopes slot slow slower slur smash smear smock smoke smooth snag snail snap snapper snare snarl sneak snide sniff snob snout snub soak sob sock soften sold sole soled soles some song sonic sort soul sound soup sour source south spain span spare spared spares spark sparse speak spear spears spec spell spells spend spends spill spin spine spined spines spit spleen spool sport spot spouse spout spray spring sputter squash squint stack stacks stain stair stairs stale stales stall stalls stammer stand stands star stare stared stares stark stars start state steel steep stick stiff still sting stint stir stock stone stoodhood stool stop store stored stores storm stout stove strap straps stray strays streak stretch stride string strip stripe strips strive stroll strong struck strut stub stuff stump stun stunt stutter style suave sub suit suits swagger swam sweat sweep sweet swing swipe swirl sword tacit tack tacks taffy tagger tail tails take taken taker takers tale tales tame tamed tang tangs tank tanks tap tape taped tapes tapper taps tar tardy tarn tarns tarp tarps task tasks taunt tea teak teal tear teeth tell tells tempo ten tend tends tenor tepid terse test tests testy theft their theme there thick thief thigh thin thing think thinks thorn threw thrive throb throne throng thumb thumbs thump tiara tidal tide tided tides tier tiers tiger tight till time timed timer timers times timid tin tins tint tip tipsy tire tired tires title toad toads toady today toil toils token told toll tome ton tone tones tong tons tool tools tooth top topaz tops torch tore torn total touch tough tout tow tower town towns trace traced traces track tracks trade traded trades trail trails train trains trait tram trap traps trash tray trays treat treble tree trees trek tremble trench trend trends trial trick trill trim trims trip trips trod trout truck true trump trust tuber tuck tulip tune tuned tunes tunic turf turn turns tusk tutor tweet twice twin twins twirl twist ultra uncle upset usual utter vague vain vale valor value valve vane vaned vanes vast vat vats veil veils vein veins verb verbs vest vets vial vials vigil vine vines visor visual vogue voice void voter vowed vowel wacky wade waded wades wage waged wager wages wale waltz wand wane waned wanes war ward wards ware wares warm warms warp warps wart warts wash waste wasted wave waved waves way ways weak wear weary weave wed wedge weedy week weep weld welds well wells welts wend went west where whiff whir wick wide wild will win wince windy wine wined wines wing wipe wire wired wires wise witty woken wood wool word worn worth would wound wove wrap wrapper wrath wreck wrench wretch wring wrist write wrong wrote yacht yam year young youth zeal zero zone zones`;
+  return [...new Set(W.split(/\s+/).filter(w => w.length >= 2))];
+}
+
+// ── Core solver ───────────────────────────────────────────────────────────────
+
+/**
+ * Check if `word` (uppercase) can be spelled using `letterPool` (array of uppercase chars)
+ * plus up to `wildcardsLeft` wildcards.
+ *
+ * This checks the WHOLE word against the WHOLE available pool.
+ * starts/ends filters are applied separately; they don't subtract from the pool.
+ */
+function canForm(word, letterPool, wildcardsLeft) {
+  const pool = [...letterPool];
+  let wilds = wildcardsLeft;
+  for (const ch of word) {
+    const idx = pool.indexOf(ch);
+    if (idx !== -1) {
+      pool.splice(idx, 1);
+    } else if (wilds > 0) {
+      wilds--;
+    } else {
+      return false;
+    }
+  }
+  return true;
+}
+
+async function solve() {
+  const raw = document.getElementById('letters').value.toUpperCase();
+  const starts = document.getElementById('starts').value.trim().toUpperCase().replace(/[^A-Z]/g, '');
+  const ends   = document.getElementById('ends').value.trim().toUpperCase().replace(/[^A-Z]/g, '');
+  const exclude = document.getElementById('exclude').value.toUpperCase().split('').filter(c => /[A-Z]/.test(c));
+
+  const cleanRaw = raw.replace(/\s/g, '?');
+  if (!cleanRaw.replace(/\?/g, '')) {
+    document.getElementById('results-wrap').innerHTML = '';
+    return;
+  }
+
+  const wildcards = (cleanRaw.match(/\?/g) || []).length;
+  if (wildcards > 3) { showError('Maximum 3 wildcards allowed.'); return; }
+
+  // starts/ends are filters only — your input letters are the full tile pool.
+  // Include prefix/suffix letters in your input if the word needs them.
+  const inputLetters = cleanRaw.split('').filter(c => /[A-Z]/.test(c));
+  const totalAvailable = inputLetters.length + wildcards;
+
+  const wrap = document.getElementById('results-wrap');
+  wrap.innerHTML = `<div class="loading"><div class="spinner"></div> Searching…</div>`;
+
+  if (!WORDS) WORDS = await loadWords();
+
+  const results = [];
+
+  for (const word of WORDS) {
+    const w = word.toUpperCase();
+    if (w.length < 2 || w.length > totalAvailable) continue;
+    if (starts && !w.startsWith(starts)) continue;
+    if (ends && !w.endsWith(ends)) continue;
+    if (exclude.some(c => w.includes(c))) continue;
+    if (canForm(w, inputLetters, wildcards)) results.push(w);
+  }
+
+  results.sort((a, b) => b.length - a.length || a.localeCompare(b));
+  renderResults([...new Set(results)]);
+}
+
+function renderResults(words) {
+  const wrap = document.getElementById('results-wrap');
+  if (!words.length) {
+    wrap.innerHTML = `<div class="no-results">No words found — try more wildcards or relax the filters.</div>`;
+    return;
+  }
+
+  const groups = {};
+  for (const w of words) {
+    if (!groups[w.length]) groups[w.length] = [];
+    groups[w.length].push(w);
+  }
+  const lengths = Object.keys(groups).map(Number).sort((a,b) => b-a);
+
+  let html = `<div class="results-header">
+    <span class="results-title">Results</span>
+    <span class="results-count">${words.length} word${words.length !== 1 ? 's' : ''}</span>
+  </div>`;
+
+  let delay = 0;
+  for (const len of lengths) {
+    html += `<div class="length-group"><div class="length-label">${len} letters</div><div class="chips-row">`;
+    for (const w of groups[len]) {
+      html += `<div class="word-chip" style="animation-delay:${delay}ms">${w}</div>`;
+      delay = Math.min(delay + 12, 260);
+    }
+    html += `</div></div>`;
+  }
+  wrap.innerHTML = html;
+}
+
+function showError(msg) {
+  document.getElementById('results-wrap').innerHTML = `<div class="error-msg">${msg}</div>`;
+}
+
+// ── Wildcard dot indicator ────────────────────────────────────────────────────
+function updateWcDots(count) {
+  for (let i = 0; i < 3; i++) {
+    document.getElementById('wc' + i).classList.toggle('used', i < count);
+  }
+}
+
+// ── Main input: space → ?, uppercase, enforce max 3 wildcards ─────────────────
+const lettersInput = document.getElementById('letters');
+
+lettersInput.addEventListener('keydown', function(e) {
+  if (e.key === ' ') {
+    e.preventDefault();
+    const currentWilds = (this.value.match(/\?/g) || []).length;
+    if (currentWilds >= 3) return;
+    const pos = this.selectionStart;
+    this.value = this.value.slice(0, pos) + '?' + this.value.slice(this.selectionEnd);
+    this.setSelectionRange(pos + 1, pos + 1);
+    updateWcDots(currentWilds + 1);
+    return;
+  }
+});
+
+lettersInput.addEventListener('input', function() {
+  const pos = this.selectionStart;
+  let val = this.value.toUpperCase().replace(/ /g, '?');
+  // Enforce max 3 wildcards by trimming excess from wherever they appear
+  let wildCount = 0;
+  val = val.split('').map(c => {
+    if (c === '?') {
+      if (wildCount < 3) { wildCount++; return '?'; }
+      return ''; // drop excess
+    }
+    return c;
+  }).join('');
+  this.value = val;
+  this.setSelectionRange(Math.min(pos, val.length), Math.min(pos, val.length));
+  updateWcDots((val.match(/\?/g) || []).length);
+});
+
+// Advanced fields uppercase
+['starts','ends','exclude'].forEach(id => {
+  document.getElementById(id).addEventListener('input', function() {
+    const pos = this.selectionStart;
+    this.value = this.value.toUpperCase();
+    this.setSelectionRange(pos, pos);
+  });
+});
+
+document.getElementById('adv-toggle').addEventListener('change', function() {
+  document.getElementById('adv-panel').classList.toggle('open', this.checked);
+});
+
+['letters','starts','ends','exclude'].forEach(id => {
+  document.getElementById(id).addEventListener('keydown', e => {
+    if (e.key === 'Enter') solve();
+  });
+});
+
+document.getElementById('solve-btn').addEventListener('click', solve);
+</script>
+</body>
+</html>
