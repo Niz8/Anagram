@@ -143,6 +143,7 @@ width: 100%;
 max-width: 620px;
 box-shadow: 0 2px 14px rgba(0,0,0,0.07);
 overflow: hidden;
+box-sizing: border-box;
 }
 @media (min-width: 480px) {
 .card { padding: 30px; }
@@ -195,6 +196,7 @@ outline: none;
 caret-color: #5a8a5e;
 margin-bottom: 10px;
 transition: border-color 0.2s;
+box-sizing: border-box;
 }
 .main-input:focus { border-color: #7a9e7e; background: #ffffff; }
 .main-input::placeholder { color: #c0bdb4; font-size: 1.3rem; letter-spacing: 0.1em; }
@@ -238,17 +240,23 @@ align-items: center;
 gap: 10px;
 cursor: pointer;
 user-select: none;
-max-width: 100%;
+background: none;
+border: none;
+padding: 0;
+margin: 0;
+font: inherit;
+text-align: left;
 }
-.advanced-toggle input { display: none; }
 
 .toggle-track {
-width: 38px; height: 22px;
+width: 38px;
+height: 22px;
 background: #c8c4ba;
 border-radius: 11px;
 position: relative;
 transition: background 0.25s;
 flex-shrink: 0;
+display: inline-block;
 }
 .toggle-track::after {
 content: ‘’;
@@ -260,11 +268,11 @@ border-radius: 50%;
 transition: transform 0.25s;
 box-shadow: 0 1px 4px rgba(0,0,0,0.25);
 }
-.advanced-toggle input:checked + .toggle-track { background: #5a8a5e; }
-.advanced-toggle input:checked + .toggle-track::after { transform: translateX(16px); }
+.advanced-toggle.on .toggle-track { background: #5a8a5e; }
+.advanced-toggle.on .toggle-track::after { transform: translateX(16px); }
 body.dark .toggle-track { background: #3a3e44; }
 body.dark .toggle-track::after { background: #e8e6e0; }
-body.dark .advanced-toggle input:checked + .toggle-track { background: #7aba7e; }
+body.dark .advanced-toggle.on .toggle-track { background: #7aba7e; }
 
 .toggle-label {
 font-size: 0.7rem;
@@ -273,6 +281,7 @@ text-transform: uppercase;
 color: #7a7870;
 background: none;
 font-family: ui-monospace, Menlo, Consolas, monospace;
+font-weight: normal;
 }
 body.dark .toggle-label { color: #888078; }
 
@@ -454,11 +463,10 @@ body.dark .version { color: #4a4844; }
     </div>
   </div>
 
-  <label class="advanced-toggle">
-    <input type="checkbox" id="adv-toggle">
+  <button class="advanced-toggle" id="adv-toggle" type="button" aria-expanded="false">
     <span class="toggle-track"></span>
     <span class="toggle-label">Advanced options</span>
-  </label>
+  </button>
 
   <div class="advanced-panel" id="adv-panel">
     <div class="adv-grid">
@@ -487,7 +495,7 @@ body.dark .version { color: #4a4844; }
   <strong>⚡ Vibecoded</strong> &nbsp;—&nbsp; Built with vibes and AI assistance.
   Word results may be incomplete or incorrect. Use at your own risk.
   Not responsible for Scrabble disputes, crossword catastrophes, or general wordplay mayhem.
-  <br><span class="version">v1.6.1</span>
+  <br><span class="version">v1.6.2</span>
 </footer>
 
 <script>
@@ -661,8 +669,10 @@ lettersInput.addEventListener('input', function() {
   });
 });
 
-document.getElementById('adv-toggle').addEventListener('change', function() {
-  document.getElementById('adv-panel').classList.toggle('open', this.checked);
+document.getElementById('adv-toggle').addEventListener('click', function() {
+  const isOn = this.classList.toggle('on');
+  this.setAttribute('aria-expanded', isOn);
+  document.getElementById('adv-panel').classList.toggle('open', isOn);
 });
 
 ['letters', 'starts', 'ends', 'exclude'].forEach(id => {
