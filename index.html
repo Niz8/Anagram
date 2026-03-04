@@ -15,6 +15,8 @@
 html, body {
 background: #f4f2ed;
 min-height: 100vh;
+overflow-x: hidden;
+width: 100%;
 }
 body {
 color: #1a1a18;
@@ -22,7 +24,8 @@ font-family: ui-monospace, Menlo, Consolas, ‘Courier New’, monospace;
 display: flex;
 flex-direction: column;
 align-items: center;
-padding: 32px 12px 100px;
+padding: 32px 16px 100px;
+box-sizing: border-box;
 transition: background 0.3s, color 0.3s;
 }
 @media (min-width: 480px) {
@@ -37,6 +40,7 @@ html.dark  { background: #161819; }
 .topbar {
 width: 100%;
 max-width: 620px;
+box-sizing: border-box;
 display: flex;
 justify-content: flex-end;
 margin-bottom: 28px;
@@ -141,12 +145,13 @@ border-radius: 18px;
 padding: 20px;
 width: 100%;
 max-width: 620px;
+min-width: 0;
 box-shadow: 0 2px 14px rgba(0,0,0,0.07);
-overflow: hidden;
 box-sizing: border-box;
+overflow: hidden;
 }
 @media (min-width: 480px) {
-.card { padding: 30px; }
+.card { padding: 28px; }
 }
 body.dark .card {
 background: #23272c;
@@ -197,6 +202,9 @@ caret-color: #5a8a5e;
 margin-bottom: 10px;
 transition: border-color 0.2s;
 box-sizing: border-box;
+-webkit-appearance: none;
+appearance: none;
+max-width: 100%;
 }
 .main-input:focus { border-color: #7a9e7e; background: #ffffff; }
 .main-input::placeholder { color: #c0bdb4; font-size: 1.3rem; letter-spacing: 0.1em; }
@@ -291,33 +299,45 @@ overflow: hidden;
 max-height: 0;
 opacity: 0;
 margin-top: 0;
+width: 100%;
+box-sizing: border-box;
 transition: max-height 0.38s ease, opacity 0.3s ease, margin-top 0.3s ease;
 }
-.advanced-panel.open { max-height: 280px; opacity: 1; margin-top: 20px; }
+.advanced-panel.open { max-height: 600px; opacity: 1; margin-top: 20px; }
 
-.adv-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
-.adv-field { display: flex; flex-direction: column; }
+.adv-grid {
+display: grid;
+grid-template-columns: 1fr;
+gap: 12px;
+width: 100%;
+box-sizing: border-box;
+}
+.adv-field { display: flex; flex-direction: column; min-width: 0; }
 .adv-field.full { grid-column: span 1; }
-@media (min-width: 480px) {
-.adv-grid { grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (min-width: 460px) {
+.adv-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
 .adv-field.full { grid-column: span 2; }
 }
 
 .adv-input {
 width: 100%;
+max-width: 100%;
 background: #eceae3;
 border: 1.5px solid #d8d4c8;
 border-radius: 9px;
 color: #1a1a18;
 font-family: ui-monospace, Menlo, Consolas, monospace;
-font-size: 0.85rem;
-letter-spacing: 0.06em;
+font-size: 0.82rem;
+letter-spacing: 0.04em;
 padding: 10px 12px;
 text-transform: uppercase;
 outline: none;
 caret-color: #5a8a5e;
 transition: border-color 0.2s;
 min-width: 0;
+box-sizing: border-box;
+-webkit-appearance: none;
+appearance: none;
 }
 .adv-input:focus { border-color: #7a9e7e; background: #ffffff; }
 .adv-input::placeholder { color: #c0bdb4; text-transform: none; font-size: 0.75rem; letter-spacing: 0.04em; }
@@ -495,7 +515,7 @@ body.dark .version { color: #4a4844; }
   <strong>⚡ Vibecoded</strong> &nbsp;—&nbsp; Built with vibes and AI assistance.
   Word results may be incomplete or incorrect. Use at your own risk.
   Not responsible for Scrabble disputes, crossword catastrophes, or general wordplay mayhem.
-  <br><span class="version">v1.6.3</span>
+  <br><span class="version">v1.6.4</span>
 </footer>
 
 <script>
