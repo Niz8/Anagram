@@ -29,6 +29,12 @@ A clean, fast, browser-based anagram solver. No server required — runs entirel
 
 ## Version History
 
+### v1.6.4
+
+- Fixed advanced option inputs overflowing on mobile Safari — added `overflow-x: hidden` to `html`/`body`, `box-sizing: border-box` throughout, `min-width: 0` on grid cells, and `-webkit-appearance: none` on all inputs
+- Constrained advanced panel and grid to 100% width with `box-sizing: border-box`
+- Breakpoint for 2-column adv grid lowered to 460px
+
 ### v1.6.3
 
 - Replaced `<button>` toggle with a plain `<div role="button">` — Safari was styling both `<label>` and `<button>` as green pills regardless of CSS resets
