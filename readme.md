@@ -29,6 +29,12 @@ A clean, fast, browser-based anagram solver. No server required — runs entirel
 
 ## Version History
 
+### v1.6.3
+
+- Replaced `<button>` toggle with a plain `<div role="button">` — Safari was styling both `<label>` and `<button>` as green pills regardless of CSS resets
+- Replaced `::after` pseudo-element knob with a real `<span class="toggle-knob">` — Safari can suppress pseudo-elements inside certain elements; a real DOM node is fully reliable
+- Toggle knob now moves via `left` property transition instead of `transform` for maximum compatibility
+
 ### v1.6.2
 
 - Fixed toggle rendering as green pill on mobile Safari — replaced `<label>/<input>` pattern with a plain `<button>` element driven by JS `.classList.toggle('on')`, eliminating all Safari form-element styling interference
