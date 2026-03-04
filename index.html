@@ -22,8 +22,11 @@ font-family: ui-monospace, Menlo, Consolas, ‘Courier New’, monospace;
 display: flex;
 flex-direction: column;
 align-items: center;
-padding: 40px 20px 100px;
+padding: 32px 12px 100px;
 transition: background 0.3s, color 0.3s;
+}
+@media (min-width: 480px) {
+body { padding: 40px 20px 100px; }
 }
 
 /* ── Dark mode overrides ────────────────────────────────────────────────────── */
@@ -135,10 +138,14 @@ body.dark header p { color: #888078; }
 background: #ffffff;
 border: 1px solid #d8d4c8;
 border-radius: 18px;
-padding: 30px;
+padding: 20px;
 width: 100%;
 max-width: 620px;
 box-shadow: 0 2px 14px rgba(0,0,0,0.07);
+overflow: hidden;
+}
+@media (min-width: 480px) {
+.card { padding: 30px; }
 }
 body.dark .card {
 background: #23272c;
@@ -226,12 +233,12 @@ body.dark .wc-dot.used { background: #7aba7e; border-color: #7aba7e; }
 
 /* ── Toggle ─────────────────────────────────────────────────────────────────── */
 .advanced-toggle {
-display: flex;
+display: inline-flex;
 align-items: center;
 gap: 10px;
 cursor: pointer;
 user-select: none;
-width: fit-content;
+max-width: 100%;
 }
 .advanced-toggle input { display: none; }
 
@@ -264,6 +271,8 @@ font-size: 0.7rem;
 letter-spacing: 0.12em;
 text-transform: uppercase;
 color: #7a7870;
+background: none;
+font-family: ui-monospace, Menlo, Consolas, monospace;
 }
 body.dark .toggle-label { color: #888078; }
 
@@ -277,9 +286,13 @@ transition: max-height 0.38s ease, opacity 0.3s ease, margin-top 0.3s ease;
 }
 .advanced-panel.open { max-height: 280px; opacity: 1; margin-top: 20px; }
 
-.adv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.adv-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
 .adv-field { display: flex; flex-direction: column; }
+.adv-field.full { grid-column: span 1; }
+@media (min-width: 480px) {
+.adv-grid { grid-template-columns: 1fr 1fr; gap: 14px; }
 .adv-field.full { grid-column: span 2; }
+}
 
 .adv-input {
 width: 100%;
@@ -288,13 +301,14 @@ border: 1.5px solid #d8d4c8;
 border-radius: 9px;
 color: #1a1a18;
 font-family: ui-monospace, Menlo, Consolas, monospace;
-font-size: 0.9rem;
-letter-spacing: 0.12em;
-padding: 10px 14px;
+font-size: 0.85rem;
+letter-spacing: 0.06em;
+padding: 10px 12px;
 text-transform: uppercase;
 outline: none;
 caret-color: #5a8a5e;
 transition: border-color 0.2s;
+min-width: 0;
 }
 .adv-input:focus { border-color: #7a9e7e; background: #ffffff; }
 .adv-input::placeholder { color: #c0bdb4; text-transform: none; font-size: 0.75rem; letter-spacing: 0.04em; }
@@ -473,7 +487,7 @@ body.dark .version { color: #4a4844; }
   <strong>⚡ Vibecoded</strong> &nbsp;—&nbsp; Built with vibes and AI assistance.
   Word results may be incomplete or incorrect. Use at your own risk.
   Not responsible for Scrabble disputes, crossword catastrophes, or general wordplay mayhem.
-  <br><span class="version">v1.6.0</span>
+  <br><span class="version">v1.6.1</span>
 </footer>
 
 <script>
