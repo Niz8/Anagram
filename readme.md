@@ -29,6 +29,13 @@ A clean, fast, browser-based anagram solver. No server required — runs entirel
 
 ## Version History
 
+### v1.6.1
+
+- Fixed advanced options inputs overflowing card on mobile — grid now stacks to single column below 480px
+- Fixed “Advanced options” toggle rendering as a large green pill on mobile — explicit styling applied
+- Reduced card and body padding on small screens
+- Reduced letter-spacing on advanced input fields to prevent overflow
+
 ### v1.6.0
 
 - Switched dictionary fetch to local `dictionary.txt` (same directory) — eliminates all CORS issues
