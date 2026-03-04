@@ -29,6 +29,11 @@ A clean, fast, browser-based anagram solver. No server required — runs entirel
 
 ## Version History
 
+### v1.6.2
+
+- Fixed toggle rendering as green pill on mobile Safari — replaced `<label>/<input>` pattern with a plain `<button>` element driven by JS `.classList.toggle('on')`, eliminating all Safari form-element styling interference
+- Added `box-sizing: border-box` defensively to card and main input to prevent overflow
+
 ### v1.6.1
 
 - Fixed advanced options inputs overflowing card on mobile — grid now stacks to single column below 480px
