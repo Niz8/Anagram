@@ -29,6 +29,13 @@ A clean, fast, browser-based anagram solver. No server required — runs entirel
 
 ## Version History
 
+### v1.6.5
+
+- Added favicon link tags (`apple-touch-icon`, `favicon-32x32`, `favicon-16x16`, `site.webmanifest`)
+- Fixed iOS zoom-on-load by updating viewport meta: added `viewport-fit=cover`, `minimum-scale=1.0`, `maximum-scale=5.0`
+- Added `apple-mobile-web-app-capable` and `theme-color` meta tags for better iOS PWA behaviour
+- Updated `site.webmanifest` with correct repo-relative paths and matching theme color `#f4f2ed`
+
 ### v1.6.4
 
 - Fixed advanced option inputs overflowing on mobile Safari — added `overflow-x: hidden` to `html`/`body`, `box-sizing: border-box` throughout, `min-width: 0` on grid cells, and `-webkit-appearance: none` on all inputs
