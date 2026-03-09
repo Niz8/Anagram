@@ -29,6 +29,11 @@ A clean, fast, browser-based anagram solver. No server required — runs entirel
 
 ## Version History
 
+### v1.7.0
+
+- Added **Clear button** — resets letters input, all advanced fields (starts with, ends with, exclude), wildcard dots, collapses advanced panel, and clears results in one tap
+- Added **persistent dark/light mode** via localStorage — preference is saved across sessions and page refreshes; falls back to system `prefers-color-scheme` if no saved preference exists
+
 ### v1.6.5
 
 - Added favicon link tags (`apple-touch-icon`, `favicon-32x32`, `favicon-16x16`, `site.webmanifest`)
